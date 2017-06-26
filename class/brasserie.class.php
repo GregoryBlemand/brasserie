@@ -672,6 +672,17 @@ class Brasserie extends CommonObject
 
 		
 	}
+	
+	public function setValid($db)
+	{
+		if ($this->status == 0){
+			$this->status = 1;
+		} else {
+			$this->status = 0;
+		}
+
+		$this->update($user);
+	}
 
 }
 

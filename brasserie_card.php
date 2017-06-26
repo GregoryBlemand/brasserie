@@ -233,6 +233,14 @@ if (empty($reshook))
 			else setEventMessages($object->error, null, 'errors');
 		}
 	}
+	
+	// Action to validate
+	if ($action == 'validate'){
+		if (!empty($user->rights->brasserie->write)) $object->setValid($db);
+		
+		header('Location: '.dol_buildpath('/custom/brasserie/brasserie_card.php', 1).'?id='.$object->id);
+		exit;
+	}
 }
 
 
@@ -284,9 +292,9 @@ if ($action == 'create')
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td><input class="flat" type="text" name="ref" value="'.GETPOST('ref').'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td><input class="flat" type="text" name="label" value="'.GETPOST('label').'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td><input class="flat" type="text" name="adresse" value="'.GETPOST('adresse').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>Brouillon<input class="flat" type="hidden" name="status" value="0"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'<input class="flat" type="hidden" name="status" value="'.GETPOST('status').'"></td></tr>';
 print '<input class="flat" type="hidden" name="fk_user_author" value="'.$user->id.'">';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td><input class="flat" type="text" name="fk_soc" value="'.GETPOST('fk_soc').'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$form->select_company($object->fk_soc,'fk_soc','',1).'</td></tr>';
 
 	print '</table>'."\n";
 
@@ -339,7 +347,7 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 {
     $res = $object->fetch_optionals($object->id, $extralabels);
 
-	dol_fiche_head($head, 'order', $langs->trans("CustomerOrder"), 0, 'order');
+	dol_fiche_head($head, 'brasserie', $langs->trans("Brasserie"), 0, 'order');
 		
 	print load_fiche_titre($langs->trans("MyModule"));
     
@@ -377,6 +385,11 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 	{
 		if ($user->rights->brasserie->create)
 		{
+			if($object->status == 0){
+				print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=validate">'.$langs->trans("Validate").'</a></div>'."\n";
+			} else {
+				print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=validate">'.$langs->trans("Reopen").'</a></div>'."\n";
+			}
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("Modify").'</a></div>'."\n";
 		}
 
