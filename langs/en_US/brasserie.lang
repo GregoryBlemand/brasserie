@@ -1,2 +1,13 @@
 #general
 MyModuleListTitle=Liste des brasseries
+
+#search
+Fieldref=référence
+Fieldlabel=Nom
+Fieldadresse=adresse
+Fieldstatus=Status
+Fieldfk_soc=Société
+MyFilter=Filtrer
+
+#list
+MyModuleListTitle=Liste des brasseries

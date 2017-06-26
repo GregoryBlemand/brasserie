@@ -231,7 +231,7 @@ class modBrasserie extends DolibarrModules
 									'mainmenu'=>'brasserie',
 									'leftmenu'=>'brasserie',
 									'url'=>'/brasserie/brasserie_list.php',
-									'langs'=>'mylangfile@brasserie',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+									'langs'=>'brasserie@brasserie',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 									'position'=>100,
 									'enabled'=>'$conf->brasserie->enabled',	// Define condition to show or hide menu entry. Use '$conf->brasserie->enabled' if entry must be visible if module is enabled.
 									'perms'=>'1',			                // Use 'perms'=>'$user->rights->brasserie->level1->level2' if you want your menu with a permission rules

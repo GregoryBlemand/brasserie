@@ -21,7 +21,7 @@
  *   	\file       brasserie/brasserie_list.php
  *		\ingroup    brasserie
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2017-06-25 16:48
+ *					Initialy built by build_class_from_table on 2017-06-26 09:22
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -69,7 +69,6 @@ $search_ref=GETPOST('search_ref','alpha');
 $search_label=GETPOST('search_label','alpha');
 $search_adresse=GETPOST('search_adresse','alpha');
 $search_status=GETPOST('search_status','int');
-$search_entity=GETPOST('search_entity','int');
 $search_fk_user_author=GETPOST('search_fk_user_author','int');
 $search_fk_soc=GETPOST('search_fk_soc','int');
 
@@ -122,8 +121,6 @@ $arrayfields=array(
 't.label'=>array('label'=>$langs->trans("Fieldlabel"), 'checked'=>1),
 't.adresse'=>array('label'=>$langs->trans("Fieldadresse"), 'checked'=>1),
 't.status'=>array('label'=>$langs->trans("Fieldstatus"), 'checked'=>1),
-'t.entity'=>array('label'=>$langs->trans("Fieldentity"), 'checked'=>1),
-'t.fk_user_author'=>array('label'=>$langs->trans("Fieldfk_user_author"), 'checked'=>1),
 't.fk_soc'=>array('label'=>$langs->trans("Fieldfk_soc"), 'checked'=>1),
 
     
@@ -179,7 +176,6 @@ $search_ref='';
 $search_label='';
 $search_adresse='';
 $search_status='';
-$search_entity='';
 $search_fk_user_author='';
 $search_fk_soc='';
 
@@ -242,7 +238,6 @@ $sql.= " t.rowid,";
 		$sql .= " t.label,";
 		$sql .= " t.adresse,";
 		$sql .= " t.status,";
-		$sql .= " t.entity,";
 		$sql .= " t.fk_user_author,";
 		$sql .= " t.fk_soc";
 
@@ -262,7 +257,6 @@ if ($search_ref) $sql.= natural_search("ref",$search_ref);
 if ($search_label) $sql.= natural_search("label",$search_label);
 if ($search_adresse) $sql.= natural_search("adresse",$search_adresse);
 if ($search_status) $sql.= natural_search("status",$search_status);
-if ($search_entity) $sql.= natural_search("entity",$search_entity);
 if ($search_fk_user_author) $sql.= natural_search("fk_user_author",$search_fk_user_author);
 if ($search_fk_soc) $sql.= natural_search("fk_soc",$search_fk_soc);
 
@@ -390,9 +384,8 @@ if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfie
 if (! empty($arrayfields['t.label']['checked'])) print_liste_field_titre($arrayfields['t.label']['label'],$_SERVER['PHP_SELF'],'t.label','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.adresse']['checked'])) print_liste_field_titre($arrayfields['t.adresse']['label'],$_SERVER['PHP_SELF'],'t.adresse','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.status']['checked'])) print_liste_field_titre($arrayfields['t.status']['label'],$_SERVER['PHP_SELF'],'t.status','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.entity']['checked'])) print_liste_field_titre($arrayfields['t.entity']['label'],$_SERVER['PHP_SELF'],'t.entity','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.fk_user_author']['checked'])) print_liste_field_titre($arrayfields['t.fk_user_author']['label'],$_SERVER['PHP_SELF'],'t.fk_user_author','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_soc']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc']['label'],$_SERVER['PHP_SELF'],'t.fk_soc','',$params,'',$sortfield,$sortorder);
+//if (! empty($arrayfields['t.fk_soc']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc']['label'],$_SERVER['PHP_SELF'],'t.fk_soc','',$params,'',$sortfield,$sortorder);
 
 //if (! empty($arrayfields['t.field1']['checked'])) print_liste_field_titre($arrayfields['t.field1']['label'],$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
 //if (! empty($arrayfields['t.field2']['checked'])) print_liste_field_titre($arrayfields['t.field2']['label'],$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
@@ -425,9 +418,8 @@ if (! empty($arrayfields['t.ref']['checked'])) print '<td class="liste_titre"><i
 if (! empty($arrayfields['t.label']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_label" value="'.$search_label.'" size="10"></td>';
 if (! empty($arrayfields['t.adresse']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_adresse" value="'.$search_adresse.'" size="10"></td>';
 if (! empty($arrayfields['t.status']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_status" value="'.$search_status.'" size="10"></td>';
-if (! empty($arrayfields['t.entity']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_entity" value="'.$search_entity.'" size="10"></td>';
 if (! empty($arrayfields['t.fk_user_author']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_user_author" value="'.$search_fk_user_author.'" size="10"></td>';
-if (! empty($arrayfields['t.fk_soc']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_soc" value="'.$search_fk_soc.'" size="10"></td>';
+// if (! empty($arrayfields['t.fk_soc']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_soc" value="'.$search_fk_soc.'" size="10"></td>';
 
 //if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10"></td>';
 //if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10"></td>';
@@ -494,6 +486,8 @@ while ($i < min($num, $limit))
     if ($obj)
     {
         $var = !$var;
+        $brasserie = new Brasserie($db);
+        $brasserie->fetch($obj->rowid);
         
         // Show here line of result
         print '<tr '.$bc[$var].'>';
@@ -509,6 +503,28 @@ while ($i < min($num, $limit))
             print '<td>'.$obj->field2.'</td>';
 		    if (! $i) $totalarray['nbfield']++;
         }*/
+        
+        if (! empty($arrayfields['t.ref']['checked']))
+        {
+        	print '<td>'.$brasserie->ref.'</td>';
+        	if (! $i) $totalarray['nbfield']++;
+        }
+        if (! empty($arrayfields['t.label']['checked']))
+        {
+        	print '<td>'.$brasserie->getNomUrl().'</td>';
+        	if (! $i) $totalarray['nbfield']++;
+        }
+        if (! empty($arrayfields['t.adresse']['checked']))
+        {
+        	print '<td>'.$brasserie->adresse.'</td>';
+        	if (! $i) $totalarray['nbfield']++;
+        }
+        if (! empty($arrayfields['t.status']['checked']))
+        {
+        	print '<td>'.$brasserie->getLibStatut().'</td>';
+        	if (! $i) $totalarray['nbfield']++;
+        }        
+        
     	// Extra fields
 		if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 		{
@@ -603,7 +619,7 @@ print '</div>'."\n";
 
 print '</form>'."\n";
 
-echo "<a href=\"brasserie_card.php?mode=edit&action=create\" class=\"butAction\"> Nouvelle Brasserie </a>";
+echo "<a href=\"brasserie_card.php?action=create\" class=\"butAction\"> Nouvelle Brasserie </a>";
 
 if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files)
 {
@@ -621,6 +637,8 @@ else
 {
     print '<br><a name="show_files"></a><a href="'.$_SERVER["PHP_SELF"].'?show_files=1'.$param.'#show_files">'.$langs->trans("ShowTempMassFilesArea").'</a>';
 }
+
+
 // End of page
 llxFooter();
 $db->close();

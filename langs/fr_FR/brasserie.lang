@@ -1,0 +1,20 @@
+#general
+MyModuleListTitle=Liste des brasseries
+MyModule=Brasserie
+
+#search
+Fieldref=référence
+Fieldlabel=Nom
+Fieldadresse=adresse
+Fieldstatus=Status
+Fieldfk_soc=Société
+MyFilter=Filtrer
+
+#list
+MyModuleListTitle=Liste des brasseries
+
+#card
+NewPub=Nouvelle Brasserie
+Create=Créer
+DeleteMyObject=Supprimer
+ConfirmDeleteMyObject=Etes vous sûr de vouloir supprimer ?

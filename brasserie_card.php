@@ -20,7 +20,7 @@
  *   	\file       brasserie/brasserie_card.php
  *		\ingroup    brasserie
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2017-06-25 16:48
+ *					Initialy built by build_class_from_table on 2017-06-26 09:22
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -57,18 +57,18 @@ $cancel     = GETPOST('cancel');
 $backtopage = GETPOST('backtopage');
 $myparam	= GETPOST('myparam','alpha');
 
+$mode       = 'view';
 
 $search_ref=GETPOST('search_ref','alpha');
 $search_label=GETPOST('search_label','alpha');
 $search_adresse=GETPOST('search_adresse','alpha');
 $search_status=GETPOST('search_status','int');
-$search_entity=GETPOST('search_entity','int');
 $search_fk_user_author=GETPOST('search_fk_user_author','int');
 $search_fk_soc=GETPOST('search_fk_soc','int');
 
 
 
-if (empty($action) && empty($id) && empty($ref)) $action='view';
+if (empty($action) && empty($id) && empty($ref)) $action='create';
 
 // Protection if external user
 if ($user->societe_id > 0)
@@ -79,6 +79,12 @@ if ($user->societe_id > 0)
 
 
 $object = new Brasserie($db);
+if(!empty($id) || $id !== ''){
+	if($object->fetch($id) <1){
+		echo 'brasserie introuvable';
+		exit;
+	}	
+}
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
@@ -108,7 +114,7 @@ if (empty($reshook))
 	{
 		if ($action != 'addlink')
 		{
-			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/list.php',1);
+			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
 			header("Location: ".$urltogo);
 			exit;
 		}		
@@ -121,7 +127,7 @@ if (empty($reshook))
 	{
 		if (GETPOST('cancel'))
 		{
-			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/list.php',1);
+			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
 			header("Location: ".$urltogo);
 			exit;
 		}
@@ -134,7 +140,6 @@ if (empty($reshook))
 	$object->label=GETPOST('label','alpha');
 	$object->adresse=GETPOST('adresse','alpha');
 	$object->status=GETPOST('status','int');
-	$object->entity=GETPOST('entity','int');
 	$object->fk_user_author=GETPOST('fk_user_author','int');
 	$object->fk_soc=GETPOST('fk_soc','int');
 
@@ -152,7 +157,7 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/list.php',1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_card.php?action=edit&id='.$object->id,1);
 				header("Location: ".$urltogo);
 				exit;
 			}
@@ -179,7 +184,6 @@ if (empty($reshook))
 	$object->label=GETPOST('label','alpha');
 	$object->adresse=GETPOST('adresse','alpha');
 	$object->status=GETPOST('status','int');
-	$object->entity=GETPOST('entity','int');
 	$object->fk_user_author=GETPOST('fk_user_author','int');
 	$object->fk_soc=GETPOST('fk_soc','int');
 
@@ -220,7 +224,7 @@ if (empty($reshook))
 		{
 			// Delete OK
 			setEventMessages("RecordDeleted", null, 'mesgs');
-			header("Location: ".dol_buildpath('/brasserie/list.php',1));
+			header("Location: ".dol_buildpath('/custom/brasserie/brasserie_list.php',1));
 			exit;
 		}
 		else
@@ -240,7 +244,7 @@ if (empty($reshook))
 * Put here all code to build page
 ****************************************************/
 
-llxHeader('','MyPageName','');
+llxHeader('',$langs->trans("NewPub"),'');
 
 $form=new Form($db);
 
@@ -266,7 +270,7 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
-	print load_fiche_titre($langs->trans("NewMyModule"));
+	print load_fiche_titre($langs->trans("NewPub"));
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="action" value="add">';
@@ -280,9 +284,8 @@ if ($action == 'create')
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td><input class="flat" type="text" name="ref" value="'.GETPOST('ref').'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td><input class="flat" type="text" name="label" value="'.GETPOST('label').'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td><input class="flat" type="text" name="adresse" value="'.GETPOST('adresse').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td><input class="flat" type="text" name="status" value="'.GETPOST('status').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldentity").'</td><td><input class="flat" type="text" name="entity" value="'.GETPOST('entity').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_user_author").'</td><td><input class="flat" type="text" name="fk_user_author" value="'.GETPOST('fk_user_author').'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>Brouillon<input class="flat" type="hidden" name="status" value="0"></td></tr>';
+print '<input class="flat" type="hidden" name="fk_user_author" value="'.$user->id.'">';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td><input class="flat" type="text" name="fk_soc" value="'.GETPOST('fk_soc').'"></td></tr>';
 
 	print '</table>'."\n";
@@ -300,7 +303,6 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td><i
 if (($id || $ref) && $action == 'edit')
 {
 	print load_fiche_titre($langs->trans("MyModule"));
-    
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -308,16 +310,16 @@ if (($id || $ref) && $action == 'edit')
 	
 	dol_fiche_head();
 
+	$form = new Form($db);
+	
 	print '<table class="border centpercent">'."\n";
 	// print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td><input class="flat" type="text" size="36" name="label" value="'.$label.'"></td></tr>';
 	// 
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td><input class="flat" type="text" name="ref" value="'.$object->ref.'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td><input class="flat" type="text" name="label" value="'.$object->label.'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td><input class="flat" type="text" name="adresse" value="'.$object->adresse.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td><input class="flat" type="text" name="status" value="'.$object->status.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldentity").'</td><td><input class="flat" type="text" name="entity" value="'.$object->entity.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_user_author").'</td><td><input class="flat" type="text" name="fk_user_author" value="'.$object->fk_user_author.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td><input class="flat" type="text" name="fk_soc" value="'.$object->fk_soc.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'<input class="flat" type="hidden" name="status" value="'.$object->status.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$form->select_company($object->fk_soc,'fk_soc','',1).'</td></tr>';
 
 	print '</table>';
 	
@@ -337,7 +339,6 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 {
     $res = $object->fetch_optionals($object->id, $extralabels);
 
-	$head = commande_prepare_head($object);
 	dol_fiche_head($head, 'order', $langs->trans("CustomerOrder"), 0, 'order');
 		
 	print load_fiche_titre($langs->trans("MyModule"));
@@ -349,16 +350,17 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print $formconfirm;
 	}
 	
+	$thirdparty_static = new Societe($db);
+	$thirdparty_static->fetch($object->fk_soc);
+	
 	print '<table class="border centpercent">'."\n";
 	// print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>'.$object->label.'</td></tr>';
 	// 
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td>'.$object->ref.'</td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td>'.$object->label.'</td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td>'.$object->adresse.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->status.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldentity").'</td><td>'.$object->entity.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_user_author").'</td><td>'.$object->fk_user_author.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$object->fk_soc.'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$thirdparty_static->getNomUrl(1).'</td></tr>';
 
 	print '</table>';
 	
@@ -373,7 +375,7 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 
 	if (empty($reshook))
 	{
-		if ($user->rights->brasserie->write)
+		if ($user->rights->brasserie->create)
 		{
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("Modify").'</a></div>'."\n";
 		}

@@ -21,7 +21,7 @@
  *      \file       brasserie/brasserie_script.php
  *		\ingroup    brasserie
  *      \brief      This file is an example for a command line script
- *					Initialy built by build_class_from_table on 2017-06-25 16:48
+ *					Initialy built by build_class_from_table on 2017-06-26 09:22
  */
 
 $sapi_type = php_sapi_name();
