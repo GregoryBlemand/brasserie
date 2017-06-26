@@ -225,12 +225,12 @@ class modBrasserie extends DolibarrModules
 		// Add here entries to declare new menus
 		//
 		// Example to declare a new Top Menu entry and its Left menu entry:
-		 $this->menu[$r]=array(	'fk_menu'=>'',			                // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+		 $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=brasserie',			                // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 									'type'=>'top',			                // This is a Top menu entry
-									'titre'=>'brasserie top menu',
+									'titre'=>'Brasserie',
 									'mainmenu'=>'brasserie',
 									'leftmenu'=>'brasserie',
-									'url'=>'/brasserie/pagetop.php',
+									'url'=>'/brasserie/brasserie_list.php',
 									'langs'=>'mylangfile@brasserie',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 									'position'=>100,
 									'enabled'=>'$conf->brasserie->enabled',	// Define condition to show or hide menu entry. Use '$conf->brasserie->enabled' if entry must be visible if module is enabled.

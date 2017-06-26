@@ -603,6 +603,7 @@ print '</div>'."\n";
 
 print '</form>'."\n";
 
+echo "<a href=\"brasserie_card.php?mode=edit&action=create\" class=\"butAction\"> Nouvelle Brasserie </a>";
 
 if ($massaction == 'builddoc' || $action == 'remove_file' || $show_files)
 {
@@ -620,8 +621,6 @@ else
 {
     print '<br><a name="show_files"></a><a href="'.$_SERVER["PHP_SELF"].'?show_files=1'.$param.'#show_files">'.$langs->trans("ShowTempMassFilesArea").'</a>';
 }
-
-
 // End of page
 llxFooter();
 $db->close();
