@@ -20,7 +20,7 @@
  */
 
 /**
- * \file    brasserie/brasserie.class.php
+ * \file    brasserie/biere.class.php
  * \ingroup brasserie
  * \brief   This file is an example for a CRUD class file (Create/Read/Update/Delete)
  *          Put some comments here
@@ -32,25 +32,25 @@ require_once DOL_DOCUMENT_ROOT . '/core/class/commonobject.class.php';
 //require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 
 /**
- * Class Brasserie
+ * Class Biere
  *
  * Put here description of your class
  *
  * @see CommonObject
  */
-class Brasserie extends CommonObject
+class Biere extends CommonObject
 {
 	/**
 	 * @var string Id to identify managed objects
 	 */
-	public $element = 'brasserie';
+	public $element = 'biere';
 	/**
 	 * @var string Name of table without prefix where object is stored
 	 */
-	public $table_element = 'brasserie';
+	public $table_element = 'biere';
 
 	/**
-	 * @var BrasserieLine[] Lines
+	 * @var BiereLine[] Lines
 	 */
 	public $lines = array();
 
@@ -61,10 +61,8 @@ class Brasserie extends CommonObject
 	public $date_maj = '';
 	public $ref;
 	public $label;
-	public $adresse;
-	public $status;
-	public $fk_user_author;
-	public $fk_soc;
+	public $prix;
+	public $fk_brasserie;
 
 	/**
 	 */
@@ -78,7 +76,7 @@ class Brasserie extends CommonObject
 	public function __construct(DoliDB $db)
 	{
 		$this->db = $db;
-		$this->table_name= "brasserie";
+		$this->table_name= "biere";
 	}
 
 	/**
@@ -103,52 +101,43 @@ class Brasserie extends CommonObject
 		if (isset($this->label)) {
 			 $this->label = trim($this->label);
 		}
-		if (isset($this->adresse)) {
-			 $this->adresse = trim($this->adresse);
+		if (isset($this->prix)) {
+			 $this->prix = trim($this->prix);
 		}
-		if (isset($this->status)) {
-			 $this->status = trim($this->status);
+		if (isset($this->fk_brasserie)) {
+			 $this->fk_brasserie = trim($this->fk_brasserie);
 		}
-		if (isset($this->fk_user_author)) {
-			 $this->fk_user_author = trim($this->fk_user_author);
-		}
-		if (isset($this->fk_soc)) {
-			 $this->fk_soc = trim($this->fk_soc);
-		}
+
+		
 
 		// Check parameters
 		// Put here code to add control on parameters values
 		$this->date_cre = dol_now();
 		$this->date_maj = dol_now();
-		
+
 		// Insert request
 		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
 		
-//		$sql.= 'rowid,';
 		$sql.= 'date_cre,';
 		$sql.= 'date_maj,';
 		$sql.= 'ref,';
 		$sql.= 'label,';
-		$sql.= 'adresse,';
-		$sql.= 'status,';
-		$sql.= 'fk_user_author,';
-		$sql.= 'fk_soc';
+		$sql.= 'prix,';
+		$sql.= 'fk_brasserie';
+
 		
 		$sql .= ') VALUES (';
-		 
-//		$sql .= ' '.(! isset($this->rowid)? ($this->db->last_insert_id(MAIN_DB_PREFIX . $this->table_element) + 1) : $this->rowid).',';
-		$sql .= ' '.(! isset($this->date_cre) || dol_strlen($this->date_cre)==0?'NULL':"'".$this->db->idate($this->date_cre)."'").','; 
+		
+		$sql .= ' '.(! isset($this->date_cre) || dol_strlen($this->date_cre)==0?'NULL':"'".$this->db->idate($this->date_cre)."'").',';
 		$sql .= ' '.(! isset($this->date_maj) || dol_strlen($this->date_maj)==0?'NULL':"'".$this->db->idate($this->date_maj)."'").',';
 		$sql .= ' '.(! isset($this->ref)?'NULL':"'".$this->db->escape($this->ref)."'").',';
 		$sql .= ' '.(! isset($this->label)?'NULL':"'".$this->db->escape($this->label)."'").',';
-		$sql .= ' '.(! isset($this->adresse)?'NULL':"'".$this->db->escape($this->adresse)."'").',';
-		$sql .= ' '.(! isset($this->status)?'NULL':$this->status).',';
-		$sql .= ' '.$user->id.',';
-		$sql .= ' '.(! isset($this->fk_soc)?'NULL':$this->fk_soc);
+		$sql .= ' '.(! isset($this->prix)?'NULL':"'".$this->prix."'").',';
+		$sql .= ' '.(! isset($this->fk_brasserie)?'NULL':$this->fk_brasserie);
 
 		
 		$sql .= ')';
-		
+
 		$this->db->begin();
 
 		$resql = $this->db->query($sql);
@@ -203,16 +192,14 @@ class Brasserie extends CommonObject
 		$sql .= " t.date_maj,";
 		$sql .= " t.ref,";
 		$sql .= " t.label,";
-		$sql .= " t.adresse,";
-		$sql .= " t.status,";
-		$sql .= " t.fk_user_author,";
-		$sql .= " t.fk_soc";
+		$sql .= " t.prix,";
+		$sql .= " t.fk_brasserie";
 
 		
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element . ' as t';
 		$sql.= ' WHERE 1 = 1';
 		if (! empty($conf->multicompany->enabled)) {
-		    $sql .= " AND entity IN (" . getEntity("brasserie", 1) . ")";
+		    $sql .= " AND entity IN (" . getEntity("biere", 1) . ")";
 		}
 		if (null !== $ref) {
 			$sql .= ' AND t.ref = ' . '\'' . $ref . '\'';
@@ -232,10 +219,10 @@ class Brasserie extends CommonObject
 				$this->date_maj = $this->db->jdate($obj->date_maj);
 				$this->ref = $obj->ref;
 				$this->label = $obj->label;
-				$this->adresse = $obj->adresse;
-				$this->status = $obj->status;
-				$this->fk_user_author = $obj->fk_user_author;
-				$this->fk_soc = $obj->fk_soc;
+				$this->prix = $obj->prix;
+				$this->fk_brasserie = $obj->fk_brasserie;
+
+				
 			}
 			
 			// Retrieve all extrafields for invoice
@@ -285,10 +272,8 @@ class Brasserie extends CommonObject
 		$sql .= " t.date_maj,";
 		$sql .= " t.ref,";
 		$sql .= " t.label,";
-		$sql .= " t.adresse,";
-		$sql .= " t.status,";
-		$sql .= " t.fk_user_author,";
-		$sql .= " t.fk_soc";
+		$sql .= " t.prix,";
+		$sql .= " t.fk_brasserie";
 
 		
 		$sql .= ' FROM ' . MAIN_DB_PREFIX . $this->table_element. ' as t';
@@ -302,7 +287,7 @@ class Brasserie extends CommonObject
 		}
 		$sql.= ' WHERE 1 = 1';
 		if (! empty($conf->multicompany->enabled)) {
-		    $sql .= " AND entity IN (" . getEntity("brasserie", 1) . ")";
+		    $sql .= " AND entity IN (" . getEntity("biere", 1) . ")";
 		}
 		if (count($sqlwhere) > 0) {
 			$sql .= ' AND ' . implode(' '.$filtermode.' ', $sqlwhere);
@@ -321,7 +306,7 @@ class Brasserie extends CommonObject
 			$num = $this->db->num_rows($resql);
 
 			while ($obj = $this->db->fetch_object($resql)) {
-				$line = new BrasserieLine();
+				$line = new BiereLine();
 
 				$line->id = $obj->rowid;
 				
@@ -329,10 +314,8 @@ class Brasserie extends CommonObject
 				$line->date_maj = $this->db->jdate($obj->date_maj);
 				$line->ref = $obj->ref;
 				$line->label = $obj->label;
-				$line->adresse = $obj->adresse;
-				$line->status = $obj->status;
-				$line->fk_user_author = $obj->fk_user_author;
-				$line->fk_soc = $obj->fk_soc;
+				$line->prix = $obj->prix;
+				$line->fk_brasserie = $obj->fk_brasserie;
 
 				
 
@@ -371,17 +354,11 @@ class Brasserie extends CommonObject
 		if (isset($this->label)) {
 			 $this->label = trim($this->label);
 		}
-		if (isset($this->adresse)) {
-			 $this->adresse = trim($this->adresse);
+		if (isset($this->prix)) {
+			 $this->prix = trim($this->prix);
 		}
-		if (isset($this->status)) {
-			 $this->status = trim($this->status);
-		}
-		if (isset($this->fk_user_author)) {
-			 $this->fk_user_author = trim($this->fk_user_author);
-		}
-		if (isset($this->fk_soc)) {
-			 $this->fk_soc = trim($this->fk_soc);
+		if (isset($this->fk_brasserie)) {
+			 $this->fk_brasserie = trim($this->fk_brasserie);
 		}
 
 		
@@ -392,15 +369,12 @@ class Brasserie extends CommonObject
 		// Update request
 		$sql = 'UPDATE ' . MAIN_DB_PREFIX . $this->table_element . ' SET';
 		
-//		$sql .= ' rowid = '.(isset($this->rowid)?$this->rowid:"null").',';
 		$sql .= ' date_cre = '.(! isset($this->date_cre) || dol_strlen($this->date_cre) != 0 ? "'".$this->db->idate($this->date_cre)."'" : 'null').',';
 		$sql .= ' date_maj = '.(! isset($this->date_maj) || dol_strlen($this->date_maj) != 0 ? "'".$this->db->idate($this->date_maj)."'" : 'null').',';
 		$sql .= ' ref = '.(isset($this->ref)?"'".$this->db->escape($this->ref)."'":"null").',';
 		$sql .= ' label = '.(isset($this->label)?"'".$this->db->escape($this->label)."'":"null").',';
-		$sql .= ' adresse = '.(isset($this->adresse)?"'".$this->db->escape($this->adresse)."'":"null").',';
-		$sql .= ' status = '.(isset($this->status)?$this->status:"null").',';
-		$sql .= ' fk_user_author = '.$user->id.',';
-		$sql .= ' fk_soc = '.(isset($this->fk_soc)?$this->fk_soc:"null");
+		$sql .= ' prix = '.(isset($this->prix)?$this->prix:"null").',';
+		$sql .= ' fk_brasserie = '.(isset($this->fk_brasserie)?$this->fk_brasserie:"null");
 
         
 		$sql .= ' WHERE rowid=' . $this->id;
@@ -503,7 +477,7 @@ class Brasserie extends CommonObject
 
 		global $user;
 		$error = 0;
-		$object = new Brasserie($this->db);
+		$object = new Biere($this->db);
 
 		$this->db->begin();
 
@@ -562,7 +536,7 @@ class Brasserie extends CommonObject
         $label.= '<br>';
         $label.= '<b>' . $langs->trans('Ref') . ':</b> ' . $this->ref;
 
-        $url = DOL_URL_ROOT.'/custom/brasserie/'.$this->table_name.'_card.php?id='.$this->id;
+        $url = DOL_URL_ROOT.'/custom/brasserie/'.$this->table_name.'_card.php?id='.$this->id.'&fk_brasserie='.$this->fk_brasserie ;
         
         $linkclose='';
         if (empty($notooltip))
@@ -615,8 +589,8 @@ class Brasserie extends CommonObject
 		if ($mode == 0)
 		{
 			$prefix='';
-			if ($status == 1) return $langs->trans('Accepted');
-			if ($status == 0 || $status == '') return $langs->trans('Draft');
+			if ($status == 1) return $langs->trans('Enabled');
+			if ($status == 0) return $langs->trans('Disabled');
 		}
 		if ($mode == 1)
 		{
@@ -665,34 +639,18 @@ class Brasserie extends CommonObject
 		$this->date_maj = '';
 		$this->ref = '';
 		$this->label = '';
-		$this->adresse = '';
-		$this->status = '';
-		$this->fk_user_author = '';
-		$this->fk_soc = '';
+		$this->prix = '';
+		$this->fk_brasserie = '';
 
-		
-	}
-	
-	public function setValid($db)
-	{
-		global $user;
-		
-		if ($this->status == 0){
-			$this->status = 1;
-		} else {
-			$this->status = 0;
-		}
-		
-		$this->update($user);
 		
 	}
 
 }
 
 /**
- * Class BrasserieLine
+ * Class BiereLine
  */
-class BrasserieLine
+class BiereLine
 {
 	/**
 	 * @var int ID
@@ -706,10 +664,8 @@ class BrasserieLine
 	public $date_maj = '';
 	public $ref;
 	public $label;
-	public $adresse;
-	public $status;
-	public $fk_user_author;
-	public $fk_soc;
+	public $prix;
+	public $fk_brasserie;
 
 	/**
 	 * @var mixed Sample line property 2

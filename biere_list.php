@@ -18,10 +18,10 @@
  */
 
 /**
- *   	\file       brasserie/brasserie_list.php
+ *   	\file       brasserie/biere_list.php
  *		\ingroup    brasserie
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2017-06-26 09:22
+ *					Initialy built by build_class_from_table on 2017-06-27 14:50
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -48,6 +48,7 @@ require_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
 require_once DOL_DOCUMENT_ROOT.'/core/lib/date.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 dol_include_once('/brasserie/class/brasserie.class.php');
+dol_include_once('/brasserie/class/biere.class.php');
 
 // Load traductions files requiredby by page
 $langs->load("brasserie");
@@ -67,10 +68,8 @@ $search_all=trim(GETPOST("sall"));
 
 $search_ref=GETPOST('search_ref','alpha');
 $search_label=GETPOST('search_label','alpha');
-$search_adresse=GETPOST('search_adresse','alpha');
-$search_status=GETPOST('search_status','int');
-$search_fk_user_author=GETPOST('search_fk_user_author','int');
-$search_fk_soc=GETPOST('search_fk_soc','int');
+$search_prix=GETPOST('search_prix','alpha');
+$search_fk_brasserie=GETPOST('search_fk_brasserie','int');
 
 
 $search_myfield=GETPOST('search_myfield');
@@ -119,9 +118,8 @@ $arrayfields=array(
     
 't.ref'=>array('label'=>$langs->trans("Fieldref"), 'checked'=>1),
 't.label'=>array('label'=>$langs->trans("Fieldlabel"), 'checked'=>1),
-'t.adresse'=>array('label'=>$langs->trans("Fieldadresse"), 'checked'=>1),
-'t.status'=>array('label'=>$langs->trans("Fieldstatus"), 'checked'=>1),
-'t.fk_soc'=>array('label'=>$langs->trans("Fieldfk_soc"), 'checked'=>1),
+'t.prix'=>array('label'=>$langs->trans("Fieldprix"), 'checked'=>1),
+'t.fk_brasserie'=>array('label'=>$langs->trans("Fieldfk_brasserie"), 'checked'=>1),
 
     
     //'t.entity'=>array('label'=>$langs->trans("Entity"), 'checked'=>1, 'enabled'=>(! empty($conf->multicompany->enabled) && empty($conf->multicompany->transverse_mode))),
@@ -174,10 +172,8 @@ if (empty($reshook))
     	
 $search_ref='';
 $search_label='';
-$search_adresse='';
-$search_status='';
-$search_fk_user_author='';
-$search_fk_soc='';
+$search_prix='';
+$search_fk_brasserie='';
 
     	
     	$search_date_creation='';
@@ -189,10 +185,10 @@ $search_fk_soc='';
     // Mass actions
     $objectclass='Skeleton';
     $objectlabel='Skeleton';
-    $permtoread = $user->rights->brasserie->read;
-    $permtodelete = $user->rights->brasserie->delete;
-    $uploaddir = $conf->brasserie->dir_output;
-    include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
+    $permtoread = $user->rights->biere->read;
+    $permtodelete = $user->rights->biere->delete;
+    $uploaddir = $conf->biere->dir_output;
+    // include DOL_DOCUMENT_ROOT.'/core/actions_massactions.inc.php';
 }
 
 
@@ -209,7 +205,7 @@ $form=new Form($db);
 
 //$help_url="EN:Module_Customers_Orders|FR:Module_Commandes_Clients|ES:Módulo_Pedidos_de_clientes";
 $help_url='';
-$title = $langs->trans('MyModuleListTitle');
+$title = $langs->trans('listbiere') . ' de la brasserie ' . $object->label;
 
 // Put here content of your page
 
@@ -236,10 +232,8 @@ $sql.= " t.rowid,";
 		$sql .= " t.date_maj,";
 		$sql .= " t.ref,";
 		$sql .= " t.label,";
-		$sql .= " t.adresse,";
-		$sql .= " t.status,";
-		$sql .= " t.fk_user_author,";
-		$sql .= " t.fk_soc";
+		$sql .= " t.prix,";
+		$sql .= " t.fk_brasserie";
 
 
 // Add fields from extrafields
@@ -248,17 +242,16 @@ foreach ($extrafields->attribute_label as $key => $val) $sql.=($extrafields->att
 $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldListSelect',$parameters);    // Note that $action and $object may have been modified by hook
 $sql.=$hookmanager->resPrint;
-$sql.= " FROM ".MAIN_DB_PREFIX."brasserie as t";
-if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."brasserie_extrafields as ef on (t.rowid = ef.fk_object)";
-$sql.= " WHERE 1 = 1";
+$sql.= " FROM ".MAIN_DB_PREFIX."biere as t";
+if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."biere_extrafields as ef on (t.rowid = ef.fk_object)";
+$sql.= " WHERE t.fk_brasserie = " . $object->id;
+
 //$sql.= " WHERE u.entity IN (".getEntity('mytable',1).")";
 
 if ($search_ref) $sql.= natural_search("ref",$search_ref);
 if ($search_label) $sql.= natural_search("label",$search_label);
-if ($search_adresse) $sql.= natural_search("adresse",$search_adresse);
-if ($search_status) $sql.= natural_search("status",$search_status);
-if ($search_fk_user_author) $sql.= natural_search("fk_user_author",$search_fk_user_author);
-if ($search_fk_soc) $sql.= natural_search("fk_soc",$search_fk_soc);
+if ($search_prix) $sql.= natural_search("prix",$search_prix);
+if ($search_fk_brasserie) $sql.= natural_search("fk_brasserie",$search_fk_brasserie);
 
 
 if ($sall)          $sql.= natural_search(array_keys($fieldstosearchall), $sall);
@@ -307,11 +300,25 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 {
     $obj = $db->fetch_object($resql);
     $id = $obj->rowid;
-    header("Location: ".DOL_URL_ROOT.'/brasserie/brasserie_card.php?id='.$id);
+    header("Location: ".DOL_URL_ROOT.'/brasserie/biere_card.php?id='.$id);
     exit;
 }
 
 llxHeader('', $title, $help_url);
+// Placement des onglets de navigation
+$h = 0;
+$head = [];
+$head[$h][0] = dol_buildpath('/brasserie/brasserie_card.php', 1).'?id='.$object->id;
+$head[$h][1] = $langs->trans('brasserie');
+$head[$h][2] = 'brasserie';
+$h++;
+
+$head[$h][0] = dol_buildpath('/brasserie/biere_list.php', 1).'?id='.$object->id;
+$head[$h][1] = $langs->trans('listbiere');
+$head[$h][2] = 'listbiere';
+$h++;
+
+dol_fiche_head($head, 1, $langs->trans("Brasserie"), 0, 'generic');
 
 $arrayofselected=is_array($toselect)?$toselect:array();
 
@@ -382,10 +389,8 @@ print '<tr class="liste_titre">';
 // 
 if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfields['t.ref']['label'],$_SERVER['PHP_SELF'],'t.ref','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.label']['checked'])) print_liste_field_titre($arrayfields['t.label']['label'],$_SERVER['PHP_SELF'],'t.label','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.adresse']['checked'])) print_liste_field_titre($arrayfields['t.adresse']['label'],$_SERVER['PHP_SELF'],'t.adresse','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.status']['checked'])) print_liste_field_titre($arrayfields['t.status']['label'],$_SERVER['PHP_SELF'],'t.status','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_user_author']['checked'])) print_liste_field_titre($arrayfields['t.fk_user_author']['label'],$_SERVER['PHP_SELF'],'t.fk_user_author','',$params,'',$sortfield,$sortorder);
-//if (! empty($arrayfields['t.fk_soc']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc']['label'],$_SERVER['PHP_SELF'],'t.fk_soc','',$params,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.prix']['checked'])) print_liste_field_titre($arrayfields['t.prix']['label'],$_SERVER['PHP_SELF'],'t.prix','',$params,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.fk_brasserie']['checked'])) print_liste_field_titre($arrayfields['t.fk_brasserie']['label'],$_SERVER['PHP_SELF'],'t.fk_brasserie','',$params,'',$sortfield,$sortorder);
 
 //if (! empty($arrayfields['t.field1']['checked'])) print_liste_field_titre($arrayfields['t.field1']['label'],$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
 //if (! empty($arrayfields['t.field2']['checked'])) print_liste_field_titre($arrayfields['t.field2']['label'],$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
@@ -416,10 +421,8 @@ print '<tr class="liste_titre">';
 // 
 if (! empty($arrayfields['t.ref']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_ref" value="'.$search_ref.'" size="10"></td>';
 if (! empty($arrayfields['t.label']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_label" value="'.$search_label.'" size="10"></td>';
-if (! empty($arrayfields['t.adresse']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_adresse" value="'.$search_adresse.'" size="10"></td>';
-if (! empty($arrayfields['t.status']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_status" value="'.$search_status.'" size="10"></td>';
-if (! empty($arrayfields['t.fk_user_author']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_user_author" value="'.$search_fk_user_author.'" size="10"></td>';
-// if (! empty($arrayfields['t.fk_soc']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_soc" value="'.$search_fk_soc.'" size="10"></td>';
+if (! empty($arrayfields['t.prix']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_prix" value="'.$search_prix.'" size="10"></td>';
+if (! empty($arrayfields['t.fk_brasserie']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_brasserie" value="'.$search_fk_brasserie.'" size="10"></td>';
 
 //if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10"></td>';
 //if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10"></td>';
@@ -486,8 +489,8 @@ while ($i < min($num, $limit))
     if ($obj)
     {
         $var = !$var;
-        $brasserie = new Brasserie($db);
-        $brasserie->fetch($obj->rowid);
+        $biere = new Biere($db);
+        $biere->fetch($obj->rowid);
         
         // Show here line of result
         print '<tr '.$bc[$var].'>';
@@ -506,25 +509,19 @@ while ($i < min($num, $limit))
         
         if (! empty($arrayfields['t.ref']['checked']))
         {
-        	print '<td>'.$brasserie->ref.'</td>';
+        	print '<td>'.$biere->ref.'</td>';
         	if (! $i) $totalarray['nbfield']++;
         }
         if (! empty($arrayfields['t.label']['checked']))
         {
-        	print '<td>'.$brasserie->getNomUrl().'</td>';
+        	print '<td>'.$biere->getNomUrl().'</td>';
         	if (! $i) $totalarray['nbfield']++;
         }
-        if (! empty($arrayfields['t.adresse']['checked']))
+        if (! empty($arrayfields['t.prix']['checked']))
         {
-        	print '<td>'.$brasserie->adresse.'</td>';
+        	print '<td>'.$biere->prix.' €</td>';
         	if (! $i) $totalarray['nbfield']++;
         }
-        if (! empty($arrayfields['t.status']['checked']))
-        {
-        	print '<td>'.$brasserie->getLibStatut().'</td>';
-        	if (! $i) $totalarray['nbfield']++;
-        }        
-        
     	// Extra fields
 		if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 		{
@@ -619,7 +616,7 @@ print '</div>'."\n";
 
 print '</form>'."\n";
 
-print "<a href=\"brasserie_card.php?action=create\" class=\"butAction\"> Nouvelle Brasserie </a>"."\n";
+print "<a href=\"biere_card.php?action=create&fk_brasserie=". $object->id ."\" class=\"butAction\"> Nouvelle Bière </a>"."\n";
 
 // End of page
 llxFooter();

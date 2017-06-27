@@ -12,9 +12,19 @@ MyFilter=Filtrer
 
 #list
 MyModuleListTitle=Liste des brasseries
+listbiere=Liste des bières
 
 #card
-NewPub=Nouvelle Brasserie
+NewPub=Nouvelle brasserie
+EditPub=Edition brasserie
+MyPub=Ma brasserie
+
+NewBeer=Nouvelle bière
+EditBeer=Edition bière
+MyBeer= Ma bière
+Fieldprix=Prix
+Fieldfk_brasserie=Brasserie
+
 Create=Créer
 DeleteMyObject=Supprimer
 ConfirmDeleteMyObject=Etes vous sûr de vouloir supprimer ?

@@ -17,10 +17,10 @@
  */
 
 /**
- *   	\file       brasserie/brasserie_card.php
+ *   	\file       brasserie/biere_card.php
  *		\ingroup    brasserie
  *		\brief      This file is an example of a php page
- *					Initialy built by build_class_from_table on 2017-06-26 09:22
+ *					Initialy built by build_class_from_table on 2017-06-27 14:50
  */
 
 //if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
@@ -45,6 +45,7 @@ if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 include_once(DOL_DOCUMENT_ROOT.'/core/class/html.formcompany.class.php');
 dol_include_once('/brasserie/class/brasserie.class.php');
+dol_include_once('/brasserie/class/biere.class.php');
 
 // Load traductions files requiredby by page
 $langs->load("brasserie");
@@ -57,18 +58,22 @@ $cancel     = GETPOST('cancel');
 $backtopage = GETPOST('backtopage');
 $myparam	= GETPOST('myparam','alpha');
 
-$mode       = 'view';
-
+$fk_brasserie = GETPOST('fk_brasserie', 'int');
+if (!empty($fk_brasserie) && $fk_brasserie !== ''){
+	$brasserie = new Brasserie($db);
+	if ($brasserie->fetch($fk_brasserie) < 1){
+		print 'Brasserie impossible à récupérer !';
+		exit;
+	}	
+}
 $search_ref=GETPOST('search_ref','alpha');
 $search_label=GETPOST('search_label','alpha');
-$search_adresse=GETPOST('search_adresse','alpha');
-$search_status=GETPOST('search_status','int');
-$search_fk_user_author=GETPOST('search_fk_user_author','int');
-$search_fk_soc=GETPOST('search_fk_soc','int');
+$search_prix=GETPOST('search_prix','alpha');
+$search_fk_brasserie=GETPOST('search_fk_brasserie','int');
 
 
 
-if (empty($action) && empty($id) && empty($ref)) $action='create';
+if (empty($action) && empty($id) && empty($ref)) $action='view';
 
 // Protection if external user
 if ($user->societe_id > 0)
@@ -78,13 +83,7 @@ if ($user->societe_id > 0)
 //$result = restrictedArea($user, 'brasserie', $id);
 
 
-$object = new Brasserie($db);
-if(!empty($id) || $id !== ''){
-	if($object->fetch($id) <1){
-		echo 'brasserie introuvable';
-		exit;
-	}	
-}
+$object = new Biere($db);
 $extrafields = new ExtraFields($db);
 
 // fetch optionals attributes and labels
@@ -94,7 +93,7 @@ $extralabels = $extrafields->fetch_name_optionals_label($object->table_element);
 include DOL_DOCUMENT_ROOT.'/core/actions_fetchobject.inc.php';  // Must be include, not include_once  // Must be include, not include_once. Include fetch and fetch_thirdparty but not fetch_optionals
 
 // Initialize technical object to manage hooks of modules. Note that conf->hooks_modules contains array array
-$hookmanager->initHooks(array('brasserie'));
+$hookmanager->initHooks(array('biere'));
 
 
 
@@ -114,7 +113,7 @@ if (empty($reshook))
 	{
 		if ($action != 'addlink')
 		{
-			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
+			$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/brasserie/biere_list.php',1).'?id=' . $object->fk_brasserie;
 			header("Location: ".$urltogo);
 			exit;
 		}		
@@ -127,7 +126,7 @@ if (empty($reshook))
 	{
 		if (GETPOST('cancel'))
 		{
-			$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
+			$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/brasserie/biere_list.php',1).'?id=' . $object->fk_brasserie;
 			header("Location: ".$urltogo);
 			exit;
 		}
@@ -138,10 +137,8 @@ if (empty($reshook))
 		
 	$object->ref=GETPOST('ref','alpha');
 	$object->label=GETPOST('label','alpha');
-	$object->adresse=GETPOST('adresse','alpha');
-	$object->status=GETPOST('status','int');
-	$object->fk_user_author=GETPOST('fk_user_author','int');
-	$object->fk_soc=GETPOST('fk_soc','int');
+	$object->prix=GETPOST('prix','alpha');
+	$object->fk_brasserie=GETPOST('fk_brasserie','int');
 
 		
 
@@ -157,7 +154,7 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_card.php?action=edit&id='.$object->id,1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/custom/brasserie/biere_list.php',1).'?id=' . $object->fk_brasserie;
 				header("Location: ".$urltogo);
 				exit;
 			}
@@ -182,10 +179,8 @@ if (empty($reshook))
 		
 	$object->ref=GETPOST('ref','alpha');
 	$object->label=GETPOST('label','alpha');
-	$object->adresse=GETPOST('adresse','alpha');
-	$object->status=GETPOST('status','int');
-	$object->fk_user_author=GETPOST('fk_user_author','int');
-	$object->fk_soc=GETPOST('fk_soc','int');
+	$object->prix=GETPOST('prix','alpha');
+	$object->fk_brasserie=GETPOST('fk_brasserie','int');
 
 		
 
@@ -219,12 +214,13 @@ if (empty($reshook))
 	// Action to delete
 	if ($action == 'confirm_delete')
 	{
+		$fk_brasserie = $object->fk_brasserie;
 		$result=$object->delete($user);
 		if ($result > 0)
 		{
 			// Delete OK
 			setEventMessages("RecordDeleted", null, 'mesgs');
-			header("Location: ".dol_buildpath('/custom/brasserie/brasserie_list.php',1));
+			header("Location: ".dol_buildpath('/custom/brasserie/biere_list.php',1).'?id=' . $fk_brasserie) ;
 			exit;
 		}
 		else
@@ -232,14 +228,6 @@ if (empty($reshook))
 			if (! empty($object->errors)) setEventMessages(null, $object->errors, 'errors');
 			else setEventMessages($object->error, null, 'errors');
 		}
-	}
-	
-	// Action to validate
-	if ($action == 'validate'){
-		if (!empty($user->rights->brasserie->create)) $object->setValid($db) ;
-		
-		header('Location: '.dol_buildpath('/custom/brasserie/brasserie_card.php', 1).'?id='.$object->id);
-		exit;
 	}
 }
 
@@ -276,9 +264,9 @@ jQuery(document).ready(function() {
 // Part to create
 if ($action == 'create')
 {
-	llxHeader('',$langs->trans("NewPub"),'');
+	llxHeader('',$langs->trans("NewBeer"),'');	
 	
-	print load_fiche_titre($langs->trans("NewPub"));
+	print load_fiche_titre($langs->trans("NewBeer"));
 
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="action" value="add">';
@@ -291,10 +279,8 @@ if ($action == 'create')
 	// 
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td><input class="flat" type="text" name="ref" value="'.GETPOST('ref').'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td><input class="flat" type="text" name="label" value="'.GETPOST('label').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td><input class="flat" type="text" name="adresse" value="'.GETPOST('adresse').'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'<input class="flat" type="hidden" name="status" value="0"></td></tr>';
-print '<input class="flat" type="hidden" name="fk_user_author" value="'.$user->id.'">';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$form->select_company($object->fk_soc,'fk_soc','',1).'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldprix").'</td><td><input class="flat" type="text" name="prix" value="'.GETPOST('prix').'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_brasserie").'</td><td>'.$brasserie->getNomUrl().'<input class="flat" type="hidden" name="fk_brasserie" value="'.$brasserie->id.'"></td></tr>';
 
 	print '</table>'."\n";
 
@@ -310,9 +296,13 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 // Part to edit record
 if (($id || $ref) && $action == 'edit')
 {
-	llxHeader('',$langs->trans("EditPub"),'');
+	$brasserie = new Brasserie($db);
+	$brasserie->fetch($object->fk_brasserie);
 	
-	print load_fiche_titre($langs->trans("MyModule"));
+	llxHeader('',$langs->trans("EditBeer"),'');
+	
+	print load_fiche_titre($langs->trans("EditBeer"));
+    
 	print '<form method="POST" action="'.$_SERVER["PHP_SELF"].'">';
 	print '<input type="hidden" name="action" value="update">';
 	print '<input type="hidden" name="backtopage" value="'.$backtopage.'">';
@@ -320,16 +310,13 @@ if (($id || $ref) && $action == 'edit')
 	
 	dol_fiche_head();
 
-	$form = new Form($db);
-	
 	print '<table class="border centpercent">'."\n";
 	// print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td><input class="flat" type="text" size="36" name="label" value="'.$label.'"></td></tr>';
 	// 
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td><input class="flat" type="text" name="ref" value="'.$object->ref.'"></td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td><input class="flat" type="text" name="label" value="'.$object->label.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td><input class="flat" type="text" name="adresse" value="'.$object->adresse.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'<input class="flat" type="hidden" name="status" value="'.$object->status.'"></td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$form->select_company($object->fk_soc,'fk_soc','',1).'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldprix").'</td><td><input class="flat" type="text" name="prix" value="'.$object->prix.'"></td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_brasserie").'</td><td>'.$brasserie->getNomUrl().'<input class="flat" type="hidden" name="fk_brasserie" value="'.$object->fk_brasserie.'"></td></tr>';
 
 	print '</table>';
 	
@@ -347,22 +334,32 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 // Part to show record
 if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'create')))
 {
-	llxHeader('',$langs->trans("MyPub"),'');
+	llxHeader('',$langs->trans("MyBeer"),'');
+	
     $res = $object->fetch_optionals($object->id, $extralabels);
     
+    $brasserie = new Brasserie($db);
+    $brasserie->fetch($object->fk_brasserie);
+
+    // Placement des onglets de navigation
     $h = 0;
     $head = [];
-    $head[$h][0] = dol_buildpath('/brasserie/brasserie_card.php', 1).'?id='.$object->id;
+    $head[$h][0] = dol_buildpath('/brasserie/brasserie_card.php', 1).'?id='.$brasserie->id;
     $head[$h][1] = $langs->trans('brasserie');
     $head[$h][2] = 'brasserie';
     $h++;
     
-    $head[$h][0] = dol_buildpath('/brasserie/biere_list.php', 1).'?id='.$object->id;
+    $head[$h][0] = dol_buildpath('/brasserie/biere_list.php', 1).'?id='.$brasserie->id;
     $head[$h][1] = $langs->trans('listbiere');
     $head[$h][2] = 'listbiere';
     $h++;
     
-	dol_fiche_head($head, 0, $langs->trans("Brasserie"), 0, 'order');
+    $head[$h][0] = dol_buildpath('/brasserie/biere_card.php', 1).'?id='.$object->id.'&fk_brasserie='.$brasserie->id;
+    $head[$h][1] = $object->label;
+    $head[$h][2] = 'listbiere';
+    $h++;
+    
+    dol_fiche_head($head, 2, $langs->trans("Brasserie"), 0, 'generic');
 		
 	print load_fiche_titre($langs->trans("MyModule"));
     
@@ -373,17 +370,13 @@ if ($object->id > 0 && (empty($action) || ($action != 'edit' && $action != 'crea
 		print $formconfirm;
 	}
 	
-	$thirdparty_static = new Societe($db);
-	$thirdparty_static->fetch($object->fk_soc);
-	
 	print '<table class="border centpercent">'."\n";
 	// print '<tr><td class="fieldrequired">'.$langs->trans("Label").'</td><td>'.$object->label.'</td></tr>';
 	// 
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldref").'</td><td>'.$object->ref.'</td></tr>';
 print '<tr><td class="fieldrequired">'.$langs->trans("Fieldlabel").'</td><td>'.$object->label.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldadresse").'</td><td>'.$object->adresse.'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldstatus").'</td><td>'.$object->getLibStatut().'</td></tr>';
-print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.$thirdparty_static->getNomUrl(1).'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldprix").'</td><td>'.$object->prix.'</td></tr>';
+print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_brasserie").'</td><td>'.$brasserie->getNomUrl().'</td></tr>';
 
 	print '</table>';
 	
@@ -400,11 +393,6 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 	{
 		if ($user->rights->brasserie->create)
 		{
-			if($object->status == 0){
-				print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=validate">'.$langs->trans("Validate").'</a></div>'."\n";
-			} else {
-				print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=validate">'.$langs->trans("Reopen").'</a></div>'."\n";
-			}
 			print '<div class="inline-block divButAction"><a class="butAction" href="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'&amp;action=edit">'.$langs->trans("Modify").'</a></div>'."\n";
 		}
 
@@ -418,7 +406,7 @@ print '<tr><td class="fieldrequired">'.$langs->trans("Fieldfk_soc").'</td><td>'.
 
 	// Example 2 : Adding links to objects
 	// Show links to link elements
-	//$linktoelem = $form->showLinkToObjectBlock($object, null, array('brasserie'));
+	//$linktoelem = $form->showLinkToObjectBlock($object, null, array('biere'));
 	//$somethingshown = $form->showLinkedObjectBlock($object, $linktoelem);
 
 }
