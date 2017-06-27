@@ -309,7 +309,7 @@ llxHeader('', $title, $help_url);
 $h = 0;
 $head = [];
 $head[$h][0] = dol_buildpath('/brasserie/brasserie_card.php', 1).'?id='.$object->id;
-$head[$h][1] = $langs->trans('brasserie');
+$head[$h][1] = $object->label;
 $head[$h][2] = 'brasserie';
 $h++;
 

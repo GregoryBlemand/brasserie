@@ -313,6 +313,16 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 
 llxHeader('', $title, $help_url);
 
+// Placement des onglets de navigation
+$h = 0;
+$head = [];
+$head[$h][0] = dol_buildpath('/brasserie/brasserie_list.php', 1);
+$head[$h][1] = $langs->trans('Brasserie');
+$head[$h][2] = 'brasserie';
+$h++;
+
+dol_fiche_head($head, 0, $langs->trans("Brasserie"), 0, 'generic');
+
 $arrayofselected=is_array($toselect)?$toselect:array();
 
 $param='';

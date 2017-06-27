@@ -476,6 +476,16 @@ class Brasserie extends CommonObject
 				$this->errors[] = 'Error ' . $this->db->lasterror();
 				dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
 			}
+			
+			$sql = 'DELETE FROM ' . MAIN_DB_PREFIX . 'biere';
+			$sql .= ' WHERE fk_brasserie=' . $this->id;
+			
+			$resql = $this->db->query($sql);
+			if (!$resql) {
+				$error ++;
+				$this->errors[] = 'Error ' . $this->db->lasterror();
+				dol_syslog(__METHOD__ . ' ' . implode(',', $this->errors), LOG_ERR);
+			}
 		}
 
 		// Commit or rollback
