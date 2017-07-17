@@ -146,8 +146,6 @@ if (($id > 0 || ! empty($ref)) && $action != 'add')
 }
 
 
-
-
 /*******************************************************************
 * ACTIONS
 *
@@ -208,22 +206,6 @@ $help_url='';
 $title = $langs->trans('listbiere') . ' de la brasserie ' . $object->label;
 
 // Put here content of your page
-
-// Example : Adding jquery code
-print '<script type="text/javascript" language="javascript">
-jQuery(document).ready(function() {
-	function init_myfunc()
-	{
-		jQuery("#myid").removeAttr(\'disabled\');
-		jQuery("#myid").attr(\'disabled\',\'disabled\');
-	}
-	init_myfunc();
-	jQuery("#mybutton").click(function() {
-		init_myfunc();
-	});
-});
-</script>';
-
 
 $sql = "SELECT";
 $sql.= " t.rowid,";
@@ -289,7 +271,10 @@ dol_syslog($script_file, LOG_DEBUG);
 $resql=$db->query($sql);
 if (! $resql)
 {
-    dol_print_error($db);
+    //dol_print_error($db);
+    setEventMessages('brasserie inaccessible', $object->errors, 'errors');
+    $urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
+    header("Location: ".$urltogo);
     exit;
 }
 
@@ -344,7 +329,7 @@ if ($user->rights->brasserie->supprimer) $arrayofmassactions['delete']=$langs->t
 if ($massaction == 'presend') $arrayofmassactions=array();
 $massactionbutton=$form->selectMassAction('', $arrayofmassactions);
 
-print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'">';
+print '<form method="POST" id="searchFormList" action="'.$_SERVER["PHP_SELF"].'?id='.$object->id.'">';
 if ($optioncss != '') print '<input type="hidden" name="optioncss" value="'.$optioncss.'">';
 print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 print '<input type="hidden" name="formfilteraction" id="formfilteraction" value="list">';
@@ -370,14 +355,14 @@ $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
 if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
 else $moreforfilter = $hookmanager->resPrint;
-
+/*
 if (! empty($moreforfilter))
 {
 	print '<div class="liste_titre liste_titre_bydiv centpercent">';
 	print $moreforfilter;
     print '</div>';
 }
-
+*/
 $varpage=empty($contextpage)?$_SERVER["PHP_SELF"]:$contextpage;
 $selectedfields=$form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage);	// This also change content of $arrayfields
 
@@ -386,11 +371,11 @@ print '<table class="tagtable liste'.($moreforfilter?" listwithfilterbefore":"")
 
 // Fields title
 print '<tr class="liste_titre">';
-// 
+//
+$params = 'id=' . $object->id;
 if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfields['t.ref']['label'],$_SERVER['PHP_SELF'],'t.ref','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.label']['checked'])) print_liste_field_titre($arrayfields['t.label']['label'],$_SERVER['PHP_SELF'],'t.label','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.prix']['checked'])) print_liste_field_titre($arrayfields['t.prix']['label'],$_SERVER['PHP_SELF'],'t.prix','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_brasserie']['checked'])) print_liste_field_titre($arrayfields['t.fk_brasserie']['label'],$_SERVER['PHP_SELF'],'t.fk_brasserie','',$params,'',$sortfield,$sortorder);
 
 //if (! empty($arrayfields['t.field1']['checked'])) print_liste_field_titre($arrayfields['t.field1']['label'],$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
 //if (! empty($arrayfields['t.field2']['checked'])) print_liste_field_titre($arrayfields['t.field2']['label'],$_SERVER['PHP_SELF'],'t.field2','',$param,'',$sortfield,$sortorder);
@@ -422,7 +407,6 @@ print '<tr class="liste_titre">';
 if (! empty($arrayfields['t.ref']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_ref" value="'.$search_ref.'" size="10"></td>';
 if (! empty($arrayfields['t.label']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_label" value="'.$search_label.'" size="10"></td>';
 if (! empty($arrayfields['t.prix']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_prix" value="'.$search_prix.'" size="10"></td>';
-if (! empty($arrayfields['t.fk_brasserie']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_brasserie" value="'.$search_fk_brasserie.'" size="10"></td>';
 
 //if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10"></td>';
 //if (! empty($arrayfields['t.field2']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field2" value="'.$search_field2.'" size="10"></td>';

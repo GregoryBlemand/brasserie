@@ -62,6 +62,7 @@ $toselect = GETPOST('toselect', 'array');
 $id			= GETPOST('id','int');
 $backtopage = GETPOST('backtopage');
 $myparam	= GETPOST('myparam','alpha');
+$fk_soc     = GETPOST('fk_soc','int');
 
 $search_all=trim(GETPOST("sall"));
 
@@ -122,7 +123,6 @@ $arrayfields=array(
 't.adresse'=>array('label'=>$langs->trans("Fieldadresse"), 'checked'=>1),
 't.status'=>array('label'=>$langs->trans("Fieldstatus"), 'checked'=>1),
 't.fk_soc'=>array('label'=>$langs->trans("Fieldfk_soc"), 'checked'=>1),
-
     
     //'t.entity'=>array('label'=>$langs->trans("Entity"), 'checked'=>1, 'enabled'=>(! empty($conf->multicompany->enabled) && empty($conf->multicompany->transverse_mode))),
     't.datec'=>array('label'=>$langs->trans("DateCreationShort"), 'checked'=>0, 'position'=>500),
@@ -251,6 +251,7 @@ $sql.=$hookmanager->resPrint;
 $sql.= " FROM ".MAIN_DB_PREFIX."brasserie as t";
 if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label)) $sql.= " LEFT JOIN ".MAIN_DB_PREFIX."brasserie_extrafields as ef on (t.rowid = ef.fk_object)";
 $sql.= " WHERE 1 = 1";
+if($fk_soc>0) $sql.=" AND fk_soc=".$fk_soc;
 //$sql.= " WHERE u.entity IN (".getEntity('mytable',1).")";
 
 if ($search_ref) $sql.= natural_search("ref",$search_ref);
@@ -314,14 +315,25 @@ if ($num == 1 && ! empty($conf->global->MAIN_SEARCH_DIRECT_OPEN_IF_ONLY_ONE) && 
 llxHeader('', $title, $help_url);
 
 // Placement des onglets de navigation
-$h = 0;
-$head = [];
-$head[$h][0] = dol_buildpath('/brasserie/brasserie_list.php', 1);
-$head[$h][1] = $langs->trans('Brasserie');
-$head[$h][2] = 'brasserie';
-$h++;
+if($fk_soc>0) {
+    $societe=new Societe($db);
+    $societe->fetch($fk_soc);
 
-dol_fiche_head($head, 0, $langs->trans("Brasserie"), 0, 'generic');
+    $head = societe_prepare_head($societe);
+    $tabname='brasserie';
+
+
+    dol_fiche_head($head, 'brasserie', $langs->trans("ThirdParty"), 0, 'company');
+} else {
+    $h = 0;
+    $head = [];
+    $head[$h][0] = dol_buildpath('/brasserie/brasserie_list.php', 1);
+    $head[$h][1] = $langs->trans('Brasserie');
+    $head[$h][2] = 'brasserie';
+    $h++;
+
+    dol_fiche_head($head, 0, $langs->trans("Brasserie"), 0, 'generic');
+}
 
 $arrayofselected=is_array($toselect)?$toselect:array();
 
@@ -373,14 +385,14 @@ $parameters=array();
 $reshook=$hookmanager->executeHooks('printFieldPreListTitle',$parameters);    // Note that $action and $object may have been modified by hook
 if (empty($reshook)) $moreforfilter .= $hookmanager->resPrint;
 else $moreforfilter = $hookmanager->resPrint;
-
+/*
 if (! empty($moreforfilter))
 {
 	print '<div class="liste_titre liste_titre_bydiv centpercent">';
 	print $moreforfilter;
     print '</div>';
 }
-
+*/
 $varpage=empty($contextpage)?$_SERVER["PHP_SELF"]:$contextpage;
 $selectedfields=$form->multiSelectArrayWithCheckbox('selectedfields', $arrayfields, $varpage);	// This also change content of $arrayfields
 
@@ -394,7 +406,7 @@ if (! empty($arrayfields['t.ref']['checked'])) print_liste_field_titre($arrayfie
 if (! empty($arrayfields['t.label']['checked'])) print_liste_field_titre($arrayfields['t.label']['label'],$_SERVER['PHP_SELF'],'t.label','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.adresse']['checked'])) print_liste_field_titre($arrayfields['t.adresse']['label'],$_SERVER['PHP_SELF'],'t.adresse','',$params,'',$sortfield,$sortorder);
 if (! empty($arrayfields['t.status']['checked'])) print_liste_field_titre($arrayfields['t.status']['label'],$_SERVER['PHP_SELF'],'t.status','',$params,'',$sortfield,$sortorder);
-if (! empty($arrayfields['t.fk_user_author']['checked'])) print_liste_field_titre($arrayfields['t.fk_user_author']['label'],$_SERVER['PHP_SELF'],'t.fk_user_author','',$params,'',$sortfield,$sortorder);
+if (! empty($arrayfields['t.fk_soc']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc']['label'],$_SERVER['PHP_SELF'],'t.fk_soc','',$params,'',$sortfield,$sortorder);
 //if (! empty($arrayfields['t.fk_soc']['checked'])) print_liste_field_titre($arrayfields['t.fk_soc']['label'],$_SERVER['PHP_SELF'],'t.fk_soc','',$params,'',$sortfield,$sortorder);
 
 //if (! empty($arrayfields['t.field1']['checked'])) print_liste_field_titre($arrayfields['t.field1']['label'],$_SERVER['PHP_SELF'],'t.field1','',$param,'',$sortfield,$sortorder);
@@ -427,8 +439,13 @@ print '<tr class="liste_titre">';
 if (! empty($arrayfields['t.ref']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_ref" value="'.$search_ref.'" size="10"></td>';
 if (! empty($arrayfields['t.label']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_label" value="'.$search_label.'" size="10"></td>';
 if (! empty($arrayfields['t.adresse']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_adresse" value="'.$search_adresse.'" size="10"></td>';
-if (! empty($arrayfields['t.status']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_status" value="'.$search_status.'" size="10"></td>';
-if (! empty($arrayfields['t.fk_user_author']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_user_author" value="'.$search_fk_user_author.'" size="10"></td>';
+if (! empty($arrayfields['t.status']['checked'])){
+    print '<td class="liste_titre">';
+    print $form->selectarray('search_statut', array('-1'=>'','0'=>$langs->trans('Draft'),'1'=>$langs->trans('Accepted')),$search_statut);
+    print '</td>';
+}
+
+if (! empty($arrayfields['t.fk_soc']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_soc" value="'.$search_fk_soc.'" size="10"></td>';
 // if (! empty($arrayfields['t.fk_soc']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_fk_soc" value="'.$search_fk_soc.'" size="10"></td>';
 
 //if (! empty($arrayfields['t.field1']['checked'])) print '<td class="liste_titre"><input type="text" class="flat" name="search_field1" value="'.$search_field1.'" size="10"></td>';
@@ -481,11 +498,10 @@ if (! empty($arrayfields['t.tms']['checked']))
 }*/
 // Action column
 print '<td class="liste_titre" align="right">';
-$searchpitco=$form->showFilterAndCheckAddButtons($massactionbutton?1:0, 'checkforselect', 1);
+$searchpitco=$form->showFilterAndCheckAddButtons(0, 'checkforselect', 1);
 print $searchpitco;
 print '</td>';
 print '</tr>'."\n";
-    
 
 $i=0;
 $var=true;
@@ -533,9 +549,16 @@ while ($i < min($num, $limit))
         {
         	print '<td>'.$brasserie->getLibStatut().'</td>';
         	if (! $i) $totalarray['nbfield']++;
-        }        
-        
-    	// Extra fields
+        }
+        if (! empty($arrayfields['t.fk_soc']['checked']))
+        {
+            $tier = new Societe($db);
+            $tier->fetch($brasserie->fk_soc);
+            print '<td>'.$tier->getNomUrl().'</td>';
+            if (! $i) $totalarray['nbfield']++;
+        }
+
+        // Extra fields
 		if (is_array($extrafields->attribute_label) && count($extrafields->attribute_label))
 		{
 		   foreach($extrafields->attribute_label as $key => $val) 
@@ -582,6 +605,7 @@ while ($i < min($num, $limit))
         }*/
 
         // Action column
+        /*
         print '<td class="nowrap" align="center">';
 	    if ($massactionbutton || $massaction)   // If we are in select mode (massactionbutton defined) or if we have already selected and sent an action ($massaction) defined
         {
@@ -591,7 +615,7 @@ while ($i < min($num, $limit))
         }
 	    print '</td>';
         if (! $i) $totalarray['nbfield']++;
-
+        */
         print '</tr>';
     }
     $i++;

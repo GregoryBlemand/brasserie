@@ -157,7 +157,7 @@ if (empty($reshook))
 			if ($result > 0)
 			{
 				// Creation OK
-				$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_card.php?action=edit&id='.$object->id,1);
+				$urltogo=$backtopage?$backtopage:dol_buildpath('/brasserie/brasserie_list.php',1);
 				header("Location: ".$urltogo);
 				exit;
 			}

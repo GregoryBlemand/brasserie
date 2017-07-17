@@ -114,6 +114,7 @@ class Biere extends CommonObject
 		// Put here code to add control on parameters values
 		$this->date_cre = dol_now();
 		$this->date_maj = dol_now();
+		$this->prix = str_replace(',','.',$this->prix);
 
 		// Insert request
 		$sql = 'INSERT INTO ' . MAIN_DB_PREFIX . $this->table_element . '(';
@@ -356,6 +357,7 @@ class Biere extends CommonObject
 		}
 		if (isset($this->prix)) {
 			 $this->prix = trim($this->prix);
+             $this->prix = str_replace(',','.',$this->prix);
 		}
 		if (isset($this->fk_brasserie)) {
 			 $this->fk_brasserie = trim($this->fk_brasserie);

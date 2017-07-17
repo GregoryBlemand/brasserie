@@ -95,8 +95,8 @@ class modBrasserie extends DolibarrModules
 									'barcode' => 0,                                  	// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 									'models' => 0,                                   	// Set this to 1 if module has its own models directory (core/modules/xxx)
 									'css' => array('/brasserie/css/brasserie.css.php'),	// Set this to relative path of css file if module has its own css file
-	 								'js' => array('/brasserie/js/brasserie.js'),          // Set this to relative path of js file if module must load a js on all pages
-									'hooks' => array() 	// Set here all hooks context managed by module(ex : 'hooks' => array('hookcontext1','hookcontext2') ). You can also set hook context 'all'
+	 								'js' => array('/brasserie/js/brasserie.js'),        // Set this to relative path of js file if module must load a js on all pages
+                                    'hooks' => array('thirdpartycard') 	                // Set here all hooks context managed by module(ex : 'hooks' => array('hookcontext1','hookcontext2') ). You can also set hook context 'all'
 		                        );
 
 		// Data directories to create when module is enabled.
@@ -149,7 +149,9 @@ class modBrasserie extends DolibarrModules
 		// 'stock'            to add a tab in stock view
 		// 'thirdparty'       to add a tab in third party view
 		// 'user'             to add a tab in user view
-        $this->tabs = array();
+        $this->tabs = array(
+            'thirdparty:+brasserie:Brasserie:brasserie@brasserie:$user->rights->brasserie->read:/brasserie/brasserie_list.php?fk_soc=__ID__'
+        );
 
 		if (! isset($conf->brasserie) || ! isset($conf->brasserie->enabled))
         {
